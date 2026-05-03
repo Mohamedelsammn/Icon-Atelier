@@ -1,88 +1,41 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:iconschange/core/localization/app_localizations.dart';
-import 'package:iconschange/features/home/views/home_screen.dart';
+import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-// Loading Indicator Widget مدمج في نفس الملف
-class LoadingIndicator extends StatelessWidget {
-  final int activeIndex;
-  final bool isDarkMode;
-
-  const LoadingIndicator({
-    super.key,
-    required this.activeIndex,
-    this.isDarkMode = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      mainAxisSize: MainAxisSize.min,
-      children: List.generate(3, (index) {
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          margin: const EdgeInsets.symmetric(horizontal: 6),
-          width: activeIndex == index ? 20 : 8,
-          height: 8,
-          decoration: BoxDecoration(
-            color: index == activeIndex
-                ? const Color(0xFF4F46E5)
-                : (isDarkMode ? Colors.grey[600] : const Color(0xFF745479)),
-            borderRadius: BorderRadius.circular(4),
-          ),
-        );
-      }),
-    );
-  }
-}
+import '../../../../core/localization/app_localizations.dart';
+import '../../../../injection_container.dart';
+import '../../settings/presentation/bloc/settings_bloc.dart';
+import '../../../../core/routing/route_names.dart';
 
 class SplashScreen extends StatefulWidget {
-  final Function? onSettingsChanged;
-  const SplashScreen({super.key, this.onSettingsChanged});
+  const SplashScreen({super.key});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
-  int _activeDotIndex = 0;
-  late Timer _timer;
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _lottieController;
   bool _hasNavigated = false;
-  bool _isDarkMode = false;
-  String _language = 'en';
 
   @override
   void initState() {
     super.initState();
-    _loadSettingsAndStart();
-  }
 
-  Future<void> _loadSettingsAndStart() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (mounted) {
-      setState(() {
-        _isDarkMode = prefs.getBool('isDarkMode') ?? false;
-        _language = prefs.getString('language') ?? 'en';
-      });
-    }
-    _startTimer();
-  }
+    // Lottie animation: 300 frames at 60fps = 5s total, we use ~3s then navigate
+    _lottieController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 5000),
+    );
 
-  void _startTimer() {
-    _timer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
-      if (mounted) {
-        setState(() {
-          _activeDotIndex = (_activeDotIndex + 1) % 3;
-        });
-      }
-    });
+    _lottieController.repeat(reverse: true);
 
+    // Navigate after 3 seconds (frame ~180 / 300)
     Timer(const Duration(seconds: 3), () {
-      _timer.cancel();
       if (!_hasNavigated && mounted) {
         _hasNavigated = true;
         _checkAndShowPermissionDialog();
@@ -91,7 +44,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkAndShowPermissionDialog() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = sl<SharedPreferences>();
     final hasSeenPermissionDialog =
         prefs.getBool('has_permission_shown') ?? false;
 
@@ -104,16 +57,17 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void _showPermissionDialog() {
     final t = AppLocalizations.of(context)!;
+    final isDarkMode = context.read<SettingsBloc>().state.isDarkMode;
 
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
         return Dialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          backgroundColor: _isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
+          backgroundColor: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
           child: Padding(
             padding: const EdgeInsets.all(24),
             child: Column(
@@ -124,7 +78,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   height: 80,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: _isDarkMode
+                    color: isDarkMode
                         ? const Color(0xFF2C2C2C)
                         : const Color(0xFFF5F5F5),
                   ),
@@ -138,22 +92,20 @@ class _SplashScreenState extends State<SplashScreen> {
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  _language == 'en' ? 'Allow Permission' : 'السماح بالإذن',
+                  t.allowPermission,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
-                    color: _isDarkMode ? Colors.white : const Color(0xFF2D2D2D),
+                    color: isDarkMode ? Colors.white : const Color(0xFF2D2D2D),
                   ),
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  _language == 'en'
-                      ? 'To change app icons, we need permission to read your installed apps.'
-                      : 'لتغيير أيقونات التطبيقات، نحتاج إلى إذن لقراءة تطبيقاتك المثبتة.',
+                  t.permissionDesc,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,
-                    color: _isDarkMode
+                    color: isDarkMode
                         ? Colors.grey[400]
                         : const Color(0xFF6B6B6B),
                     height: 1.4,
@@ -165,8 +117,8 @@ class _SplashScreenState extends State<SplashScreen> {
                   height: 48,
                   child: ElevatedButton(
                     onPressed: () async {
-                      Navigator.pop(context);
-                      final prefs = await SharedPreferences.getInstance();
+                      Navigator.pop(dialogContext);
+                      final prefs = sl<SharedPreferences>();
                       await prefs.setBool('has_permission_shown', true);
                       if (mounted) _goToHome();
                     },
@@ -178,7 +130,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       ),
                     ),
                     child: Text(
-                      _language == 'en' ? 'Allow' : 'السماح',
+                      t.allow,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -189,14 +141,14 @@ class _SplashScreenState extends State<SplashScreen> {
                 const SizedBox(height: 12),
                 TextButton(
                   onPressed: () async {
-                    final prefs = await SharedPreferences.getInstance();
+                    final prefs = sl<SharedPreferences>();
                     await prefs.setBool('has_permission_shown', true);
                     SystemNavigator.pop();
                   },
                   child: Text(
-                    _language == 'en' ? 'Exit' : 'خروج',
+                    t.exit,
                     style: TextStyle(
-                      color: _isDarkMode
+                      color: isDarkMode
                           ? Colors.grey[400]
                           : const Color(0xFF999999),
                       fontSize: 14,
@@ -213,116 +165,34 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void _goToHome() {
     if (!mounted) return;
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) => HomeScreen(onSettingsChanged: widget.onSettingsChanged),
-      ),
-    );
+    Navigator.pushReplacementNamed(context, RouteNames.home);
   }
 
   @override
   void dispose() {
-    _timer.cancel();
+    _lottieController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _isDarkMode ? const Color(0xFF121212) : Colors.white,
-      body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Expanded(
-              flex: 4,
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 220,
-                      height: 220,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: const [
-                            Color.fromARGB(40, 78, 69, 228),
-                            Color.fromARGB(40, 245, 205, 249),
-                          ],
-                        ),
-                      ),
-                      child: Center(
-                        child: SvgPicture.asset(
-                          'assets/images/Icon Graphic (Intentional Asymmetry & Layering)_margin.svg',
-                          width: 130,
-                          height: 150,
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Text(
-                      _language == 'en' ? 'Icon Atelier' : 'أيقونة أتلييه',
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w600,
-                        fontSize: 28,
-                        letterSpacing: -0.5,
-                        color: _isDarkMode
-                            ? Colors.white
-                            : const Color(0xFF2D2D2D),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      _language == 'en'
-                          ? 'THE DIGITAL CURATOR'
-                          : 'المنسق الرقمي',
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w500,
-                        fontSize: 12,
-                        letterSpacing: 1.5,
-                        color: _isDarkMode
-                            ? Colors.grey[500]
-                            : const Color(0xFF8E8E8E),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  LoadingIndicator(
-                    activeIndex: _activeDotIndex,
-                    isDarkMode: _isDarkMode,
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    _language == 'en' ? 'CURATING' : 'جاري التجهيز',
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w400,
-                      fontSize: 11,
-                      letterSpacing: 1.1,
-                      color: _isDarkMode
-                          ? Colors.grey[500]
-                          : const Color(0xFF5A6062),
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                ],
-              ),
-            ),
-          ],
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFF1E184C), Color(0xFF2F2377), Color(0xFF15103C)],
+          ),
+        ),
+        child: Center(
+          child: Lottie.asset(
+            'assets/images/splash_animation_1.json',
+            controller: _lottieController,
+            fit: BoxFit.contain,
+            reverse: true,
+            repeat: true,
+          ),
         ),
       ),
     );

@@ -1,75 +1,54 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:iconschange/core/localization/app_localizations.dart';
-import 'package:iconschange/features/splash/views/splash_screen_view.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'core/localization/app_localizations.dart';
+import 'core/theme/app_theme.dart';
+import 'core/routing/app_router.dart';
+import 'core/routing/route_names.dart';
+import 'features/settings/presentation/bloc/settings_bloc.dart';
+import 'features/settings/presentation/bloc/settings_event.dart';
+import 'features/settings/presentation/bloc/settings_state.dart';
+import 'injection_container.dart' as di;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await di.init();
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  bool _isDarkMode = false;
-  String _language = 'en';
-
-  @override
-  void initState() {
-    super.initState();
-    _loadSettings();
-  }
-
-  Future<void> _loadSettings() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _isDarkMode = prefs.getBool('isDarkMode') ?? false;
-      _language = prefs.getString('language') ?? 'en';
-    });
-  }
-
-  // دالة لإعادة تشغيل التطبيق بالكامل
-  void restartApp() {
-    // حفظ الإعدادات الحالية
-    _loadSettings();
-    // إعادة تشغيل التطبيق بالكامل
-    runApp(MyApp());
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Icon Atelier',
-      locale: Locale(_language),
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en'), Locale('ar')],
-      theme: ThemeData.light().copyWith(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF4F46E5)),
-        scaffoldBackgroundColor: const Color(0xFFF8F9FA),
-        useMaterial3: true,
-      ),
-      darkTheme: ThemeData.dark().copyWith(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF4F46E5),
-          brightness: Brightness.dark,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (_) => di.sl<SettingsBloc>()..add(LoadSettings()),
         ),
-        scaffoldBackgroundColor: const Color(0xFF121212),
-        useMaterial3: true,
+      ],
+      child: BlocBuilder<SettingsBloc, SettingsState>(
+        builder: (context, state) {
+          return MaterialApp(
+            
+            onGenerateTitle: (context) => AppLocalizations.of(context)!.appName,
+            locale: state.locale,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en'), Locale('ar')],
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: state.themeMode,
+            initialRoute: RouteNames.splash,
+            onGenerateRoute: AppRouter.generateRoute,
+            debugShowCheckedModeBanner: false,
+          );
+        },
       ),
-      themeMode: _isDarkMode ? ThemeMode.dark : ThemeMode.light,
-      home: SplashScreen(onSettingsChanged: restartApp),
-      debugShowCheckedModeBanner: false,
     );
   }
 }

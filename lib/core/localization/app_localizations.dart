@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-
 class AppLocalizations {
   final Locale locale;
 
@@ -38,6 +36,10 @@ class AppLocalizations {
   String get enterNewName => _get('enterNewName');
   String get createShortcut => _get('createShortcut');
   String get shortcutCreatedSuccess => _get('shortcutCreatedSuccess');
+  String get shortcutCreated => _get('shortcutCreated');
+  String get creationFailed => _get('creationFailed');
+  String get customizeIcon => _get('customizeIcon');
+  String get premiumPacks => _get('premiumPacks');
   String get creatingShortcut => _get('creatingShortcut');
   String get appInfo => _get('appInfo');
   String get help => _get('help');
@@ -55,6 +57,8 @@ class AppLocalizations {
   String get applyIcon => _get('applyIcon');
   String get applyToApp => _get('applyToApp');
   String get iconAppliedSuccess => _get('iconAppliedSuccess');
+  String get applyIconPack => _get('applyIconPack');
+  String get applying => _get('applying');
 
   // ===== PRISM PACK =====
   String get prismPack => _get('prismPack');
@@ -62,6 +66,8 @@ class AppLocalizations {
   String get prismPackDesc => _get('prismPackDesc');
   String get gradient => _get('gradient');
   String get premiumTheme => _get('premiumTheme');
+  String get darkMinimal => _get('darkMinimal');
+  String get glassmorphism => _get('glassmorphism');
 
   // ===== SETTINGS =====
   String get settings => _get('settings');
@@ -78,8 +84,27 @@ class AppLocalizations {
   String get privacyText1 => _get('privacyText1');
   String get privacyText2 => _get('privacyText2');
   String get privacyText3 => _get('privacyText3');
+  String get privacyText4 => _get('privacyText4');
+  String get privacyText5 => _get('privacyText5');
   String get english => _get('english');
   String get arabic => _get('arabic');
+  String get loadingApps => _get('loadingApps');
+  String get developer => _get('developer');
+  String get lastUpdated => _get('lastUpdated');
+  String get madeWith => _get('madeWith');
+  String get privacyQuestions => _get('privacyQuestions');
+  String get prismModernTitle => _get('prismModernTitle');
+  String get prismModernDesc => _get('prismModernDesc');
+  String get allIcons => _get('allIcons');
+  String get system => _get('system');
+  String get social => _get('social');
+  String get productivity => _get('productivity');
+  String get allowPermission => _get('allowPermission');
+  String get permissionDesc => _get('permissionDesc');
+  String get allow => _get('allow');
+  String get exit => _get('exit');
+  String get digitalCurator => _get('digitalCurator');
+  String get curating => _get('curating');
 
   String _get(String key) {
     return _translations[locale.languageCode]?[key] ??
@@ -108,6 +133,10 @@ class AppLocalizations {
       'enterNewName': 'Enter new name',
       'createShortcut': 'Create Shortcut',
       'shortcutCreatedSuccess': 'Shortcut created successfully!',
+      'shortcutCreated': 'Shortcut created successfully!',
+      'creationFailed': 'Creation Failed',
+      'customizeIcon': 'Customize Icon',
+      'premiumPacks': 'Premium Packs',
       'creatingShortcut': 'Creating shortcut...',
       'appInfo': 'App Info',
       'help': 'Help',
@@ -121,9 +150,9 @@ class AppLocalizations {
       'outline': 'Outline',
       'includedIcons': 'Included Icons',
       'total': 'total',
-      'applyIcon': 'Apply Icon',
-      'applyToApp': 'Apply this {style} icon to {app}?',
       'iconAppliedSuccess': '{name} icon applied successfully!',
+      'applyIconPack': 'Apply Icon Pack',
+      'applying': 'Applying...',
       'prismPack': 'Prism Pack',
       'prismPackTitle': 'Prism Pack',
       'prismPackDesc':
@@ -140,12 +169,33 @@ class AppLocalizations {
       'privacyPolicy': 'Privacy Policy',
       'privacySub': 'Read our privacy policy',
       'version': 'Version',
-      'aboutText': 'Customize your home screen with beautiful icons and packs.',
-      'privacyText1': 'We value your privacy. This app:',
-      'privacyText2': '• Does not collect personal data',
-      'privacyText3': '• Only accesses installed apps for icon changing',
+      'aboutText': 'Icon Atelier is your premier destination for home screen personalization. We offer a curated selection of handcrafted icon packs, from the stealthy Carbon aesthetics to the vibrant Prism gradients. Our goal is to provide a seamless, ad-free experience that empowers you to express your unique style through your device.',
+      'privacyText1': 'Your privacy is our top priority. Icon Atelier is designed to respect your data:',
+      'privacyText2': '• No Data Collection: We do not collect, store, or transmit any personal information, location data, or device identifiers.',
+      'privacyText3': '• Local Processing: All icon customizations and shortcut creations are performed entirely on your device.',
+      'privacyText4': '• App List Usage: We access your installed apps list only to allow you to select which app to customize. This list never leaves your device.',
+      'privacyText5': '• No Analytics: We do not use any third-party tracking or analytics services.',
       'english': 'English',
       'arabic': 'Arabic',
+      'darkMinimal': 'Dark & Minimal',
+      'glassmorphism': 'Glassmorphism',
+      'loadingApps': 'Loading apps...',
+      'developer': 'Developer',
+      'lastUpdated': 'Last Updated',
+      'madeWith': 'Made with Creative Hub ❤️ for Android Customizers',
+      'privacyQuestions': 'Questions? Contact our support team for privacy concerns.',
+      'prismModernTitle': 'Prism Modern',
+      'prismModernDesc': 'A sophisticated collection of glassmorphic icons featuring subtle gradients and minimal geometric structure.',
+      'allIcons': 'All Icons',
+      'system': 'System',
+      'social': 'Social',
+      'productivity': 'Productivity',
+      'allowPermission': 'Allow Permission',
+      'permissionDesc': 'To change app icons, we need permission to read your installed apps.',
+      'allow': 'Allow',
+      'exit': 'Exit',
+      'digitalCurator': 'THE DIGITAL CURATOR',
+      'curating': 'CURATING',
     },
     'ar': {
       'appName': 'أيقونة أتلييه',
@@ -168,6 +218,10 @@ class AppLocalizations {
       'enterNewName': 'أدخل اسماً جديداً',
       'createShortcut': 'إنشاء اختصار',
       'shortcutCreatedSuccess': 'تم إنشاء الاختصار بنجاح!',
+      'shortcutCreated': 'تم إنشاء الاختصار بنجاح!',
+      'creationFailed': 'فشل الإنشاء',
+      'customizeIcon': 'تخصيص الأيقونة',
+      'premiumPacks': 'حزم مميزة',
       'creatingShortcut': 'جاري إنشاء الاختصار...',
       'appInfo': 'معلومات التطبيق',
       'help': 'مساعدة',
@@ -184,6 +238,8 @@ class AppLocalizations {
       'applyIcon': 'تطبيق أيقونة',
       'applyToApp': 'تطبيق هذه الأيقونة {style} على {app}؟',
       'iconAppliedSuccess': 'تم تطبيق أيقونة {name} بنجاح!',
+      'applyIconPack': 'تطبيق حزمة الأيقونات',
+      'applying': 'جاري التطبيق...',
       'prismPack': 'حزمة بريزم',
       'prismPackTitle': 'حزمة بريزم',
       'prismPackDesc':
@@ -200,12 +256,33 @@ class AppLocalizations {
       'privacyPolicy': 'سياسة الخصوصية',
       'privacySub': 'اقرأ سياسة الخصوصية',
       'version': 'الإصدار',
-      'aboutText': 'خصص شاشة هاتفك بأيقونات وحزم جميلة.',
-      'privacyText1': 'نحن نقدر خصوصيتك. هذا التطبيق:',
-      'privacyText2': '• لا يجمع بيانات شخصية',
-      'privacyText3': '• يصل فقط للتطبيقات المثبتة لتغيير الأيقونات',
+      'aboutText': 'أيقونة أتلييه هي وجهتك الأولى لتخصيص شاشة هاتفك. نحن نقدم مجموعة مختارة من حزم الأيقونات المصممة يدوياً، من جماليات "كاربون" الهادئة إلى تدرجات "بريزم" الحيوية. هدفنا هو توفير تجربة سلسة وخالية من الإعلانات تمنحك القوة للتعبير عن أسلوبك الفريد من خلال جهازك.',
+      'privacyText1': 'خصوصيتك هي أولويتنا القصوى. تم تصميم "أيقونة أتلييه" لاحترام بياناتك:',
+      'privacyText2': '• عدم جمع البيانات: نحن لا نجمع أو نخزن أو ننقل أي معلومات شخصية أو بيانات موقع أو معرفات جهاز.',
+      'privacyText3': '• معالجة محلية: يتم تنفيذ جميع تخصيصات الأيقونات وإنشاء الاختصارات بالكامل على جهازك.',
+      'privacyText4': '• استخدام قائمة التطبيقات: نصل إلى قائمة التطبيقات المثبتة فقط للسماح لك باختيار التطبيق الذي تريد تخصيصه. هذه القائمة لا تغادر جهازك أبداً.',
+      'privacyText5': '• لا توجد تحليلات: نحن لا نستخدم أي خدمات تتبع أو تحليلات من طرف ثالث.',
       'english': 'الإنجليزية',
       'arabic': 'العربية',
+      'darkMinimal': 'داكن وبسيط',
+      'glassmorphism': 'تأثير زجاجي',
+      'loadingApps': 'جاري تحميل التطبيقات...',
+      'developer': 'المطور',
+      'lastUpdated': 'آخر تحديث',
+      'madeWith': 'صنع بـ ❤️ من Creative Hub لمخصصي الأندرويد',
+      'privacyQuestions': 'لديك أسئلة؟ تواصل مع فريق الدعم لدينا بخصوص مخاوف الخصوصية.',
+      'prismModernTitle': 'بريزم مودرن',
+      'prismModernDesc': 'مجموعة متطورة من الأيقونات الزجاجية تتميز بتدرجات خفيفة وهيكل هندسي بسيط.',
+      'allIcons': 'الكل',
+      'system': 'النظام',
+      'social': 'التواصل',
+      'productivity': 'الإنتاجية',
+      'allowPermission': 'السماح بالإذن',
+      'permissionDesc': 'لتغيير أيقونات التطبيقات، نحتاج إلى إذن لقراءة تطبيقاتك المثبتة.',
+      'allow': 'السماح',
+      'exit': 'خروج',
+      'digitalCurator': 'المنسق الرقمي',
+      'curating': 'جاري التجهيز',
     },
   };
 }
