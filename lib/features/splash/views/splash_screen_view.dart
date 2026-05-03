@@ -27,7 +27,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     _lottieController.repeat(reverse: true);
 
-    // Navigate after 3 seconds (frame ~180 / 300)
+    // Navigate after 5 seconds (frame ~180 / 300)
     Timer(const Duration(seconds: 5), () {
       if (!_hasNavigated && mounted) {
         _hasNavigated = true;
